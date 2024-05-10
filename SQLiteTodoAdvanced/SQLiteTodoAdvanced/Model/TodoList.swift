@@ -1,9 +1,16 @@
-//
-//  TodoList.swift
-//  SQLiteTodoAdvanced
-//
-//  Created by 신나라 on 5/10/24.
-//
+// MARK: Description
+/*
+    Description : Model  TodoList)
+    Date : 2024.5. 10
+    Author : Ilhera
+    Updates :
+         2024.05.10  by pdg
+            -
+    Detail : -
+    Short keys : com.swiftlec.SQLiteTodoAdvanced
+
+*/
+
 
 struct TodoList {
     var todoText: String
