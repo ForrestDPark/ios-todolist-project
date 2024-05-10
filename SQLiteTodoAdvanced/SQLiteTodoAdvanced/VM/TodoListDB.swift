@@ -22,7 +22,7 @@ protocol QueryModelProtocol {
 
 class TodoListDB{
     var db: OpaquePointer?
-    var addressList: [TodoList] = []
+    var todoList: [TodoList] = []
     var delegate: QueryModelProtocol!
     
     init() {
@@ -51,7 +51,7 @@ class TodoListDB{
     // 조회
     func queryDB(){
         var stmt: OpaquePointer?
-        let queryString = "SELECT * FROM todoList order by sname"
+        let queryString = "SELECT * FROM todoList order by insertdate"
         
         if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
             let errMsg = String(cString: sqlite3_errmsg(db)!)
@@ -60,22 +60,16 @@ class TodoListDB{
         }
 
         while(sqlite3_step(stmt) == SQLITE_ROW){
-//            let id = Int(sqlite3_column_int(stmt, 0))
-//            let name = String(cString: sqlite3_column_text(stmt, 1))
-//            let phone = String(cString: sqlite3_column_text(stmt, 2))
-//            let address = String(cString: sqlite3_column_text(stmt, 3))
-//            let relation = String(cString: sqlite3_column_text(stmt, 4))
-//            var image: UIImage = UIImage()
-//            
-//            if let dataBlob = sqlite3_column_blob(stmt, 5){
-//                let dataBlobLength = sqlite3_column_bytes(stmt, 5)
-//                let data = Data(bytes: dataBlob, count: Int(dataBlobLength))
-//                image = UIImage(data: data)!
-//            }
-//            
-//            addressList.append(Address(id: id, name: name, phone: phone, address: address, relation: relation, image: image))
+            let id = Int(sqlite3_column_int(stmt, 0))
+            let text = String(cString: sqlite3_column_text(stmt, 1))
+            let insertdate = String(cString: sqlite3_column_text(stmt, 2))
+            let compledate = String(cString: sqlite3_column_text(stmt, 3))
+            let status = Int(sqlite3_column_int(stmt, 4))
+            let seq = Int(sqlite3_column_int(stmt, 5))
+            
+            todoList.append(TodoList(todoText: text, insertDate: insertdate, compleDate: compledate, status: status, seq: seq))
         }
-        self.delegate.itemDownloaded(items: addressList)
+        self.delegate.itemDownloaded(items: todoList)
     }
     
     
