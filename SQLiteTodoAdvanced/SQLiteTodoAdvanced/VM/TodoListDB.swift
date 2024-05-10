@@ -37,14 +37,14 @@ class TodoListDB{
     var delegate: QueryModelProtocol!
     
     init() {
-        let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appending(path: "AddressData.sqlite")
+        let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appending(path: "todoList.sqlite")
         
         if sqlite3_open(fileURL.path(percentEncoded: true), &db) != SQLITE_OK{
             print("error opening database")
         }
         
         // Table 만들기
-        if sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS todoList (sid INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT, insertdate TEXT, compledate TEXT, status INTEGER, seq INTEGER)", nil, nil, nil) != SQLITE_OK{
+        if sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS todoList (id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT, insertdate TEXT, compledate TEXT, status INTEGER, seq INTEGER)", nil, nil, nil) != SQLITE_OK{
             let errMsg = String(cString: sqlite3_errmsg(db)!)
             print("error creating table :\(errMsg)")
         }
@@ -55,8 +55,25 @@ class TodoListDB{
     // compledate : 완료된 날짜 => 처음 insert 시에는 compledate는 널값 처리
     func insertDB(text: String, insertdate: String, compledate: String, status: Int, seq: Int) -> Bool{
         
+            var stmt: OpaquePointer?
+            let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+            let queryString = "INSERT INTO todoList ( text, insertdate, compledate, status, seq) VALUES (?,?,?,?,?)"
+        var result : Bool = true
+            sqlite3_prepare(db, queryString, -1, &stmt, nil)
+            
+            sqlite3_bind_text(stmt, 1, text, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_text(stmt, 2, insertdate, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_text(stmt, 3, compledate, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_int(stmt, 4, Int32(status))
+            sqlite3_bind_int(stmt, 5, Int32(seq))
         
-        return true
+            if sqlite3_step(stmt) == SQLITE_DONE {
+                 result = true
+            }else{
+                 result = false
+            }
+        
+        return result
     }
     
     // 조회
