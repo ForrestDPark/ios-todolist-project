@@ -5,7 +5,7 @@
     Author : Ilhera
     Updates :
          2024.05.10  by pdg
-            -
+            - DB 삭제 function 부활 시킴 db 이름 todoList (L 대문자임!!)
     Detail : -
     Short keys : com.swiftlec.SQLiteTodoAdvanced
 
@@ -81,18 +81,18 @@ class TodoListDB{
     
     // 삭제
     func deleteDB(id: Int) -> Bool{
-//        var stmt: OpaquePointer?
-//        let queryString = "DELETE FROM address WHERE sid = ?"
-//        
-//        sqlite3_prepare(db, queryString, -1, &stmt, nil)
-//        
-//        sqlite3_bind_int(stmt, 1, Int32(id))
-//
-//        if sqlite3_step(stmt) == SQLITE_DONE{
-//            return true
-//        }else{
-//            return false
-//        }
+        var stmt: OpaquePointer?
+        let queryString = "DELETE FROM todoList WHERE sid = ?"
+        
+        sqlite3_prepare(db, queryString, -1, &stmt, nil)
+        
+        sqlite3_bind_int(stmt, 1, Int32(id))
+
+        if sqlite3_step(stmt) == SQLITE_DONE{
+            return true
+        }else{
+            return false
+        }
         
     return true
     }
