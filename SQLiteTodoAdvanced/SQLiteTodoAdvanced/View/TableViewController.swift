@@ -19,16 +19,17 @@ class TableViewController: UITableViewController {
     
     var dataArray: [TodoList] = []
     
+    // MARK: Init
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        reloadAction()
    
     }
 
     override func viewWillAppear(_ animated: Bool) {
         reloadAction()
     }
-    
+    // MARK: -- Functions
     func reloadAction() {
         let todoList = TodoListDB()
         dataArray.removeAll()
