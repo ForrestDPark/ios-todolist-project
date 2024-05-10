@@ -8,7 +8,10 @@
             - DB 삭제 function 부활 시킴 db 이름 todoList (L 대문자임!!)
             - compledate : todo 완료 일자임.
             - delete function return 수정
-    Detail : -
+    Detail : 
+            - DB Columns
+                id,text,insertdate,compledate,status,seq
+
     Bundle : com.swiftlec.SQLiteTodoAdvanced
 
 */
