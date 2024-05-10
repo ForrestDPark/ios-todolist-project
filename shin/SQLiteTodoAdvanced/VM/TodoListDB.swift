@@ -1,20 +1,9 @@
-// MARK: Description
-/*
-    Description : View Model
-    Date : 2024.5. 10
-    Author : Ilhera
-    Updates :
-         2024.05.10  by pdg
-            - DB 삭제 function 부활 시킴 db 이름 todoList (L 대문자임!!)
-            - compledate : todo 완료 일자임.
-            - delete function return 수정
-    Detail : 
-            - DB Columns
-                id,text,insertdate,compledate,status,seq
-
-    Bundle : com.swiftlec.SQLiteTodoAdvanced
-
-*/
+//
+//  TodoListDB.swift
+//  SQLiteTodoAdvanced
+//
+//  Created by 신나라 on 5/10/24.
+//
 
 import Foundation
 import SQLite3
@@ -53,33 +42,44 @@ class TodoListDB{
     // todo insert
     // insertdate : 입력날짜
     // compledate : 완료된 날짜 => 처음 insert 시에는 compledate는 널값 처리
-    func insertDB(text: String, insertdate: String, compledate: String, status: Int, seq: Int) -> Bool{
+    func insertDB(text: String, insertdate: String, compledate: String, status: Int) -> Bool{
+        var stmt: OpaquePointer?
+        var newSeq: Int32 = 0
         
-            var stmt: OpaquePointer?
-            let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-            let queryString = "INSERT INTO todoList ( text, insertdate, compledate, status, seq) VALUES (?,?,?,?,?)"
-        var result : Bool = true
-            sqlite3_prepare(db, queryString, -1, &stmt, nil)
-            
-            sqlite3_bind_text(stmt, 1, text, -1, SQLITE_TRANSIENT)
-            sqlite3_bind_text(stmt, 2, insertdate, -1, SQLITE_TRANSIENT)
-            sqlite3_bind_text(stmt, 3, compledate, -1, SQLITE_TRANSIENT)
-            sqlite3_bind_int(stmt, 4, Int32(status))
-            sqlite3_bind_int(stmt, 5, Int32(seq))
-        
-            if sqlite3_step(stmt) == SQLITE_DONE {
-                 result = true
-            }else{
-                 result = false
+        let query = "SELECT MAX(seq) FROM todoList"
+        if sqlite3_prepare_v2(db, query, -1, &stmt, nil) == SQLITE_OK {
+            if sqlite3_step(stmt) == SQLITE_ROW {
+                let currentSeq = sqlite3_column_int(stmt, 0) //현재 seq
+                newSeq = currentSeq + 1     // 새로운 seq 값
+                print("newSeq값 : \(newSeq)")
             }
+        }
         
-        return result
+        let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+        let queryString = "INSERT INTO todoList (text, insertdate, compledate, status, seq) VALUES (?,?,?,?,?)"
+        
+        sqlite3_prepare(db, queryString, -1, &stmt, nil)
+        
+        sqlite3_bind_text(stmt, 1, text, -1, SQLITE_TRANSIENT)
+        sqlite3_bind_text(stmt, 2, insertdate, -1, SQLITE_TRANSIENT)
+        sqlite3_bind_text(stmt, 3, compledate, -1, SQLITE_TRANSIENT)
+        sqlite3_bind_int(stmt, 4, Int32(status))
+        sqlite3_bind_int(stmt, 5, newSeq)
+      
+        print("여기까지 왔다.")
+        
+        if sqlite3_step(stmt) == SQLITE_DONE{
+            print("해냄!!!")
+            return true
+        }else{
+            return false
+        }
     }
     
     // 조회
     func queryDB(){
         var stmt: OpaquePointer?
-        let queryString = "SELECT * FROM todoList ORDER BY insertdate"
+        let queryString = "SELECT * FROM todoList order by seq"
         
         if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
             let errMsg = String(cString: sqlite3_errmsg(db)!)
@@ -103,41 +103,41 @@ class TodoListDB{
     
     // 삭제
     func deleteDB(id: Int) -> Bool{
-        var stmt: OpaquePointer?
-        let queryString = "DELETE FROM todoList WHERE sid = ?"
-        var result = true
-        sqlite3_prepare(db, queryString, -1, &stmt, nil)
+//        var stmt: OpaquePointer?
+//        let queryString = "DELETE FROM address WHERE sid = ?"
+//
+//        sqlite3_prepare(db, queryString, -1, &stmt, nil)
+//
+//        sqlite3_bind_int(stmt, 1, Int32(id))
+//
+//        if sqlite3_step(stmt) == SQLITE_DONE{
+//            return true
+//        }else{
+//            return false
+//        }
         
-        sqlite3_bind_int(stmt, 1, Int32(id))
-
-        if sqlite3_step(stmt) == SQLITE_DONE{
-            result = true
-        }else{
-            result = false
-        }
-        
-    return result
+    return true
     }
     
     // 수정
     func updateDB(id: Int, text: String, status: Int, seq: Int) -> Bool{
 //        var stmt: OpaquePointer?
 //        let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-//                
+//
 //        let queryString = "UPDATE address SET sname = ?, sphone = ?, saddress = ?, srelation = ?, simage = ? WHERE sid = ?"
-//        
+//
 //        sqlite3_prepare(db, queryString, -1, &stmt, nil)
-//        
+//
 //        sqlite3_bind_text(stmt, 1, name, -1, SQLITE_TRANSIENT)
 //        sqlite3_bind_text(stmt, 2, phone, -1, SQLITE_TRANSIENT)
 //        sqlite3_bind_text(stmt, 3, address, -1, SQLITE_TRANSIENT)
 //        sqlite3_bind_text(stmt, 4, relation, -1, SQLITE_TRANSIENT)
-//        
+//
 //        let imageData = image.jpegData(compressionQuality: 0.4)! as NSData
 //        sqlite3_bind_blob(stmt, 5, imageData.bytes, Int32(imageData.length), SQLITE_TRANSIENT)
-//        
+//
 //        sqlite3_bind_int(stmt, 6, Int32(id))
-//      
+//
 //        if sqlite3_step(stmt) == SQLITE_DONE{
 //            return true
 //        }else{

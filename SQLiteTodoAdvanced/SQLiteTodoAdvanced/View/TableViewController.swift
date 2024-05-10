@@ -19,16 +19,17 @@ class TableViewController: UITableViewController {
     
     var dataArray: [TodoList] = []
     
+    // MARK: Init
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        reloadAction()
    
     }
 
     override func viewWillAppear(_ animated: Bool) {
         reloadAction()
     }
-    
+    // MARK: -- Functions
     func reloadAction() {
         let todoList = TodoListDB()
         dataArray.removeAll()
@@ -95,15 +96,37 @@ class TableViewController: UITableViewController {
     }
     */
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+    // MARK: -- Actions
+     
+     @IBAction func btnInsert(_ sender: Any) {
+         //
+                let todolistDB = TodoListDB()
+                let addAlert = UIAlertController(title: "Todo List", message: "추가한 내용을 입력하세요.", preferredStyle: .alert)
+                
+                addAlert.addTextField { textField in
+                        textField.placeholder = "내용을 입력하세요"
+                    }
+                let addAction = UIAlertAction(title: "네", style: .default, handler: {ACTION in
+                    if let textField = addAlert.textFields?.first, let text = textField.text {
+                        // 입력된 텍스트 사용
+                        //id,text,insertdate,compledate,status,seq
+                        let result = todolistDB.insertDB(text: "--", insertdate: "", compledate: "", status: 1, seq: 1)
+                        if result{
+                            print("DB 입력된 내용: \(text)")
+                        }
+                        // 뒤로 이동
+                        self.navigationController?.popViewController(animated: true)
+                            }
+                        self.reloadAction()
+                    
+                })
+                let cancelAction = UIAlertAction(title: "취소" , style: .cancel)
+                addAlert.addAction(addAction)
+                addAlert.addAction(cancelAction)
+                present(addAlert, animated: true)
+         
+     }
+     
 
 }
 
