@@ -37,7 +37,7 @@ class TodoListDB{
     var delegate: QueryModelProtocol!
     
     init() {
-        let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appending(path: "AddressData.sqlite")
+        let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appending(path: "todoList.sqlite")
         
         if sqlite3_open(fileURL.path(percentEncoded: true), &db) != SQLITE_OK{
             print("error opening database")
