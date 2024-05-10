@@ -5,9 +5,9 @@
     Author : Ilhera
     Updates :
          2024.05.10  by pdg
-            -
+            - 주석 생성
     Detail : -
-    Short keys : com.swiftlec.SQLiteTodoAdvanced
+    Bundle : com.swiftlec.SQLiteTodoAdvanced
 
 */
 

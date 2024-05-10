@@ -5,9 +5,11 @@
     Author : Ilhera
     Updates :
          2024.05.10  by pdg
-            -
+            - DB 삭제 function 부활 시킴 db 이름 todoList (L 대문자임!!)
+            - compledate : todo 완료 일자임.
+            - delete function return 수정
     Detail : -
-    Short keys : com.swiftlec.SQLiteTodoAdvanced
+    Bundle : com.swiftlec.SQLiteTodoAdvanced
 
 */
 
@@ -57,7 +59,7 @@ class TodoListDB{
     // 조회
     func queryDB(){
         var stmt: OpaquePointer?
-        let queryString = "SELECT * FROM todoList order by insertdate"
+        let queryString = "SELECT * FROM todoList ORDER BY insertdate"
         
         if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
             let errMsg = String(cString: sqlite3_errmsg(db)!)
@@ -81,20 +83,20 @@ class TodoListDB{
     
     // 삭제
     func deleteDB(id: Int) -> Bool{
-//        var stmt: OpaquePointer?
-//        let queryString = "DELETE FROM address WHERE sid = ?"
-//        
-//        sqlite3_prepare(db, queryString, -1, &stmt, nil)
-//        
-//        sqlite3_bind_int(stmt, 1, Int32(id))
-//
-//        if sqlite3_step(stmt) == SQLITE_DONE{
-//            return true
-//        }else{
-//            return false
-//        }
+        var stmt: OpaquePointer?
+        let queryString = "DELETE FROM todoList WHERE sid = ?"
+        var result = true
+        sqlite3_prepare(db, queryString, -1, &stmt, nil)
         
-    return true
+        sqlite3_bind_int(stmt, 1, Int32(id))
+
+        if sqlite3_step(stmt) == SQLITE_DONE{
+            result = true
+        }else{
+            result = false
+        }
+        
+    return result
     }
     
     // 수정
