@@ -7,9 +7,9 @@
          2024.05.10  by pdg
             - DB 삭제 function 부활 시킴 db 이름 todoList (L 대문자임!!)
             - compledate : todo 완료 일자임.
-            - delete function return 수정 
+            - delete function return 수정
     Detail : -
-    Short keys : com.swiftlec.SQLiteTodoAdvanced
+    Bundle : com.swiftlec.SQLiteTodoAdvanced
 
 */
 
