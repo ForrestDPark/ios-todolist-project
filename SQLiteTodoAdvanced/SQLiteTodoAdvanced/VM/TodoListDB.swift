@@ -6,7 +6,7 @@
     Updates :
          2024.05.10  by pdg
             - DB 삭제 function 부활 시킴 db 이름 todoList (L 대문자임!!)
-            - compledate : todo 완료 일자임. 
+            - compledate : todo 완료 일자임.
     Detail : -
     Short keys : com.swiftlec.SQLiteTodoAdvanced
 
@@ -58,7 +58,7 @@ class TodoListDB{
     // 조회
     func queryDB(){
         var stmt: OpaquePointer?
-        let queryString = "SELECT * FROM todoList order by insertdate"
+        let queryString = "SELECT * FROM todoList ORDER BY insertdate"
         
         if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
             let errMsg = String(cString: sqlite3_errmsg(db)!)
