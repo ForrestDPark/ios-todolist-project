@@ -8,10 +8,12 @@
             - project 생성, 주석 처리
          2024.05.11 by pdg
             - insert 기능 완성
-            - inser date 를 시간 분단위로 기록 할 것인가?
+            - inser date 를 시간 분단위로 기록 할 것인가? -> 나중 생각..
+            - 주석 생성
+            - 수정기능 구현
  
     Detail : 
-        -
+        - 주요 변수, DB column
     Bundle : com.swiftlec.SQLiteTodoAdvanced
 
 */
@@ -25,7 +27,6 @@ class TableViewController: UITableViewController {
     
     //MARK: -- Property
     var dataArray: [TodoList] = []
-    
     
     
     // MARK: -- View Init
@@ -48,18 +49,19 @@ class TableViewController: UITableViewController {
         tvListView.reloadData()
     }
     
-    // MARK: - Table view data source
-    
+    // MARK: -- Table view data source
+    // Table Columns
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
-    
+    // Table Rows
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return dataArray.count
     }
     
+    // Table Cell content 생성
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell", for: indexPath)
         
@@ -73,7 +75,8 @@ class TableViewController: UITableViewController {
     
     
     // MARK: -- Actions
-    //Insert Action button
+    //
+    // MARK: -- 1. Insert Action button
     @IBAction func btnInsert(_ sender: Any) {
         // Query Model instance
         let todolistDB = TodoListDB()
@@ -125,6 +128,32 @@ class TableViewController: UITableViewController {
         addAlert.addAction(addAction)
         present(addAlert,animated: true)
     }
+    
+    // Delete Action button
+    // MARK: -- 2. Delete Cell
+    // Override to support editing the table view.
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            
+            
+            // SQLite 에서 삭제하는 쿼리 실행
+            let todoListDB = TodoListDB()
+            let result = todoListDB.deleteDB(id: todoListDB[indexPath.row].id)
+            if result{
+                print("DB 에서 삭제 되었습니다.")
+                //self.readValue()
+            }
+            // Delete the row from the data source
+            todoList.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            
+        } else if editingStyle == .insert {
+            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+        }
+    }
+    
+    
 }// END table view controller
 
 
