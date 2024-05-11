@@ -1,10 +1,17 @@
-//
-//  SearchTodoViewController.swift
-//  SQLiteTodoAdvanced
-//
-//  Created by 박동근 on 5/11/24.
-//
+// MARK: Description
+/*
+    Description : Search Todo List View Controller
+    Date : 2024.5. 11
+    Author : Ilhera
+    Updates :
+         2024.05.11 by pdg :
+            - table search 기능 되는 view controller 생성
+            - storyboard design 수정
+    Detail :
+        - 주요 변수, DB column
+    Bundle : com.swiftlec.SQLiteTodoAdvanced
 
+*/
 import UIKit
 
 class SearchTodoViewController: UIViewController {
