@@ -4,13 +4,13 @@
     Date : 2024.5. 10
     Author : Ilhera
     Updates :
-         2024.05.10  by pdg
+         2024.05.10  by pdg :
             - project 생성, 주석 처리
-         2024.05.11 by pdg
+         2024.05.11 by pdg :
             - insert 기능 완성
             - inser date 를 시간 분단위로 기록 할 것인가? -> 나중 생각..
             - 주석 생성
-            - 수정기능 구현
+            - 수정기능 구현 완료
  
     Detail : 
         - 주요 변수, DB column
@@ -41,6 +41,8 @@ class TableViewController: UITableViewController {
     }
     
     // MARK: -- Functions
+    
+    // MARK: Reload data
     func reloadAction() {
         let todoList = TodoListDB()
         dataArray.removeAll()
@@ -134,7 +136,6 @@ class TableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             
-            
             // SQLite 에서 삭제하는 쿼리 실행
             let todoListDB = TodoListDB()
             let result = todoListDB.deleteDB(id: dataArray[indexPath.row].id)
@@ -148,11 +149,12 @@ class TableViewController: UITableViewController {
         } else if editingStyle == .insert {
         }
     }
-    // message
+    // delete swipe message
     override func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
         return "삭제!"
     }
-    // 목록 순서 바꾸기
+    
+    // MARK: -- 삭제 swife 후 목록 순서 바꾸기
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         // 이동할 item 의 복사
         let itemToMove = dataArray[fromIndexPath.row]
@@ -161,7 +163,59 @@ class TableViewController: UITableViewController {
         // 이동할 위치에 insert 한다.
         dataArray.insert(itemToMove, at: to.row)
     }
-    
+    // cell clikc 시 Actions (didselectrow)
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //
+        // Query Model instance
+        let todolistDB = TodoListDB()
+        // Alert Controller
+        let editAlert = UIAlertController(title: "Todo List", message: "수정할 내용을 입력하세요.", preferredStyle: .alert)
+        
+        // todo list insert 할 내용 입력 tf
+        editAlert.addTextField { textField in
+            textField.text = self.dataArray[indexPath.row].todoText
+        }
+        
+        // 취소 action
+        let cancelAction = UIAlertAction(title: "취소" , style: .cancel)
+        
+        // EDIT action
+        let addAction = UIAlertAction(title: "네", style: .default, handler: {ACTION in
+            // guard let Text 내용 fetch
+            guard let  inputEditedText = editAlert.textFields?.first?.text else {return}
+
+            
+            let result = todolistDB.updateDB(
+                id:         self.dataArray[indexPath.row].id,
+                text:       inputEditedText,
+                status:     self.dataArray[indexPath.row].status,
+                seq:        self.dataArray[indexPath.row].seq
+            )
+            
+            if result{
+                // 수정이 완료 되었을때
+                let completeAlert = UIAlertController(title: "결과", message: "수정이 완료 되었습니다.", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "확인", style: .default)
+                
+                completeAlert.addAction(okAction)
+                self.present(completeAlert, animated: true)
+                self.reloadAction()
+                
+            }else{
+                // 수장에 문제가 있을때
+                let insertFailAlert = UIAlertController(title: "결과", message: "수정에 실패 했습니다.", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "확인", style: .default)
+                
+                insertFailAlert.addAction(okAction)
+                self.present(insertFailAlert, animated: true)
+                self.reloadAction()
+            }// if - esle
+        }) // action closer end
+        editAlert.addAction(cancelAction)
+        editAlert.addAction(addAction)
+        present(editAlert,animated: true)
+        
+    }
     
 }// END table view controller
 

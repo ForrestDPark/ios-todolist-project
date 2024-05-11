@@ -4,11 +4,11 @@
     Date : 2024.5. 10
     Author : Ilhera
     Updates :
-         2024.05.10  by pdg
+         2024.05.10  by pdg :
             - DB 삭제 function 부활 시킴 db 이름 todoList (L 대문자임!!)
             - compledate : todo 완료 일자임.
             - delete function return 수정
-         2024.05.11 by pdg
+         2024.05.11 by pdg :
             - insert 쿼리 완성
             - delete 쿼리 완성
             - update 쿼리 완성
@@ -120,7 +120,7 @@ class TodoListDB{
     // 삭제
     func deleteDB(id: Int) -> Bool{
         var stmt: OpaquePointer?
-        let queryString = "DELETE FROM todoList WHERE sid = ?"
+        let queryString = "DELETE FROM todoList WHERE id = ?"
         var result = true
         sqlite3_prepare(db, queryString, -1, &stmt, nil)
         
@@ -137,21 +137,27 @@ class TodoListDB{
     
     // 수정  id,text,insertdate,compledate,status,seq
     func updateDB(id: Int, text: String, status: Int, seq: Int) -> Bool{
+        //
+        print("-- UpdateDB query start operation ---")
+        print(" parameter check  \n id : \(id) \n text: \(text) \n status: \(status) \n seq: \(seq))")
         var stmt: OpaquePointer?
         let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
         var result = true
-        let queryString = "UPDATE todoList SET text = ?, status = ?, seq = ?,  WHERE id = ?"
-        
+        let queryString = "UPDATE todoList SET text = ?, status = ?, seq = ?  WHERE id = ?"
+       
         sqlite3_prepare(db, queryString, -1, &stmt, nil)
         
         sqlite3_bind_text(stmt, 1, text, -1, SQLITE_TRANSIENT)
         sqlite3_bind_int(stmt, 2, Int32(status))
         sqlite3_bind_int(stmt, 3, Int32(seq))
         sqlite3_bind_int(stmt, 4, Int32(id))
-      
+        
+        print(" ->Query String : \(queryString)")
         if sqlite3_step(stmt) == SQLITE_DONE{
+            print("수정 완료")
             result =  true
         }else{
+            print("수정 실패")
             result =  false
         }
         return result
