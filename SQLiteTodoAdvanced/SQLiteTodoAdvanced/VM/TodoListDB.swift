@@ -8,7 +8,10 @@
             - DB 삭제 function 부활 시킴 db 이름 todoList (L 대문자임!!)
             - compledate : todo 완료 일자임.
             - delete function return 수정
-    Detail : 
+         2024.05.11 by pdg
+            - insert 기능 완성
+            
+    Detail :
             - DB Columns
                 id,text,insertdate,compledate,status,seq
 

@@ -5,30 +5,40 @@
     Author : Ilhera
     Updates :
          2024.05.10  by pdg
-            -
-    Detail : -
-    Short keys : com.swiftlec.SQLiteTodoAdvanced
+            - project 생성, 주석 처리
+         2024.05.11 by pdg
+            - insert 기능 완성
+            - inser date 를 시간 분단위로 기록 할 것인가?
+ 
+    Detail : 
+        -
+    Bundle : com.swiftlec.SQLiteTodoAdvanced
 
 */
 
 import UIKit
 
 class TableViewController: UITableViewController {
-
+    //MARK: -- UI interfaces
     @IBOutlet var tvListView: UITableView!
     
+    
+    //MARK: -- Property
     var dataArray: [TodoList] = []
     
-    // MARK: Init
+    
+    
+    // MARK: -- View Init
     override func viewDidLoad() {
         super.viewDidLoad()
         reloadAction()
-   
+        
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
-        reloadAction()
+        reloadAction() // DB data 다시 불러오기
     }
+    
     // MARK: -- Functions
     func reloadAction() {
         let todoList = TodoListDB()
@@ -39,97 +49,87 @@ class TableViewController: UITableViewController {
     }
     
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return dataArray.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell", for: indexPath)
         
         var content = cell.defaultContentConfiguration()
         content.text = dataArray[indexPath.row].todoText
-        
+        content.image = UIImage(systemName: "pencil.circle")
         cell.contentConfiguration = content
-
+        
         return cell
     }
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
+    
+    
     // MARK: -- Actions
-     
-     @IBAction func btnInsert(_ sender: Any) {
-         //
-                let todolistDB = TodoListDB()
-                let addAlert = UIAlertController(title: "Todo List", message: "추가한 내용을 입력하세요.", preferredStyle: .alert)
+    //Insert Action button
+    @IBAction func btnInsert(_ sender: Any) {
+        // Query Model instance
+        let todolistDB = TodoListDB()
+        // Alert Controller
+        let addAlert = UIAlertController(title: "Todo List", message: "추가할 내용을 입력하세요.", preferredStyle: .alert)
+        
+        // todo list insert 할 내용 입력 tf
+        addAlert.addTextField { textField in
+            textField.placeholder = "내용을 입력하세요"
+        }
+        
+        // 취소 action
+        let cancelAction = UIAlertAction(title: "취소" , style: .cancel)
+        
+        // ADD action
+        let addAction = UIAlertAction(title: "네", style: .default, handler: {ACTION in
+            // guard let Text 내용 fetch
+            guard let  inputTodoText = addAlert.textFields?.first?.text else {return}
+            // todo 입력 일 생성
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            // 현재 일자
+            let currentDate = Date()
+            let insertDate = dateFormatter.string(from: currentDate)
+            let isComplete = 0 // todo 완료 여부
+            
+            let result = todolistDB.insertDB(text: inputTodoText, insertdate: insertDate, compledate: "", status: isComplete, seq: 1)
+            
+            if result{
+                // 입력이 완료 되었을때
+                let completeAlert = UIAlertController(title: "결과", message: "입력이 완료 되었습니다.", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "확인", style: .default)
                 
-                addAlert.addTextField { textField in
-                        textField.placeholder = "내용을 입력하세요"
-                    }
-                let addAction = UIAlertAction(title: "네", style: .default, handler: {ACTION in
-                    if let textField = addAlert.textFields?.first, let text = textField.text {
-                        // 입력된 텍스트 사용
-                        //id,text,insertdate,compledate,status,seq
-                        let result = todolistDB.insertDB(text: "--", insertdate: "", compledate: "", status: 1, seq: 1)
-                        if result{
-                            print("DB 입력된 내용: \(text)")
-                        }
-                        // 뒤로 이동
-                        self.navigationController?.popViewController(animated: true)
-                            }
-                        self.reloadAction()
-                    
-                })
-                let cancelAction = UIAlertAction(title: "취소" , style: .cancel)
-                addAlert.addAction(addAction)
-                addAlert.addAction(cancelAction)
-                present(addAlert, animated: true)
-         
-     }
-     
+                completeAlert.addAction(okAction)
+                self.present(completeAlert, animated: true)
+                self.reloadAction()
+                
+            }else{
+                // 입력에 문제가 있을때
+                let insertFailAlert = UIAlertController(title: "결과", message: "입력에 실패 했습니다.", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "확인", style: .default)
+                
+                insertFailAlert.addAction(okAction)
+                self.present(insertFailAlert, animated: true)
+                self.reloadAction()
+            }// if - esle
+        }) // action closer end
+        addAlert.addAction(cancelAction)
+        addAlert.addAction(addAction)
+        present(addAlert,animated: true)
+    }
+}// END table view controller
 
-}
 
+// MARK: -- Extensions
+// todoList VM data download
 extension TableViewController: QueryModelProtocol {
     func itemDownloaded(items: [TodoList]) {
         dataArray = items
