@@ -4,7 +4,7 @@
     Date : 2024.5. 11
     Author : Ilhera
     Updates :
-         2024.05.11 by pdg :
+         2024.05.11 by pdg : search todo list 작업 
             - table search 기능 되는 view controller 생성
             - storyboard design 수정
     Detail :
