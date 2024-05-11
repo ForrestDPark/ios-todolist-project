@@ -9,7 +9,10 @@
             - compledate : todo 완료 일자임.
             - delete function return 수정
          2024.05.11 by pdg
-            - insert 기능 완성
+            - insert 쿼리 완성
+            - delete 쿼리 완성
+            - update 쿼리 완성
+ 
             
     Detail :
             - DB Columns
@@ -91,6 +94,7 @@ class TodoListDB{
         }
 
         while(sqlite3_step(stmt) == SQLITE_ROW){
+            // DB colums
             let id = Int(sqlite3_column_int(stmt, 0))
             let text = String(cString: sqlite3_column_text(stmt, 1))
             let insertdate = String(cString: sqlite3_column_text(stmt, 2))
@@ -98,8 +102,17 @@ class TodoListDB{
             let status = Int(sqlite3_column_int(stmt, 4))
             let seq = Int(sqlite3_column_int(stmt, 5))
             
-            todoList.append(TodoList(todoText: text, insertDate: insertdate, compleDate: compledate, status: status, seq: seq))
+            // insert into model from fetched date
+            todoList.append(TodoList(
+                id: id,
+                todoText: text,
+                insertDate: insertdate,
+                compleDate: compledate,
+                status: status,
+                seq: seq
+            ))
         }
+        
         self.delegate.itemDownloaded(items: todoList)
     }
     
@@ -122,30 +135,25 @@ class TodoListDB{
     return result
     }
     
-    // 수정
+    // 수정  id,text,insertdate,compledate,status,seq
     func updateDB(id: Int, text: String, status: Int, seq: Int) -> Bool{
-//        var stmt: OpaquePointer?
-//        let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-//                
-//        let queryString = "UPDATE address SET sname = ?, sphone = ?, saddress = ?, srelation = ?, simage = ? WHERE sid = ?"
-//        
-//        sqlite3_prepare(db, queryString, -1, &stmt, nil)
-//        
-//        sqlite3_bind_text(stmt, 1, name, -1, SQLITE_TRANSIENT)
-//        sqlite3_bind_text(stmt, 2, phone, -1, SQLITE_TRANSIENT)
-//        sqlite3_bind_text(stmt, 3, address, -1, SQLITE_TRANSIENT)
-//        sqlite3_bind_text(stmt, 4, relation, -1, SQLITE_TRANSIENT)
-//        
-//        let imageData = image.jpegData(compressionQuality: 0.4)! as NSData
-//        sqlite3_bind_blob(stmt, 5, imageData.bytes, Int32(imageData.length), SQLITE_TRANSIENT)
-//        
-//        sqlite3_bind_int(stmt, 6, Int32(id))
-//      
-//        if sqlite3_step(stmt) == SQLITE_DONE{
-//            return true
-//        }else{
-//            return false
-//        }
-        return true
+        var stmt: OpaquePointer?
+        let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+        var result = true
+        let queryString = "UPDATE todoList SET text = ?, status = ?, seq = ?,  WHERE id = ?"
+        
+        sqlite3_prepare(db, queryString, -1, &stmt, nil)
+        
+        sqlite3_bind_text(stmt, 1, text, -1, SQLITE_TRANSIENT)
+        sqlite3_bind_int(stmt, 2, Int32(status))
+        sqlite3_bind_int(stmt, 3, Int32(seq))
+        sqlite3_bind_int(stmt, 4, Int32(id))
+      
+        if sqlite3_step(stmt) == SQLITE_DONE{
+            result =  true
+        }else{
+            result =  false
+        }
+        return result
     }
 }

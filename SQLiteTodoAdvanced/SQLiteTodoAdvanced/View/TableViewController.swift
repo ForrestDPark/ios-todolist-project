@@ -131,26 +131,35 @@ class TableViewController: UITableViewController {
     
     // Delete Action button
     // MARK: -- 2. Delete Cell
-    // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             
             
             // SQLite 에서 삭제하는 쿼리 실행
             let todoListDB = TodoListDB()
-            let result = todoListDB.deleteDB(id: todoListDB[indexPath.row].id)
+            let result = todoListDB.deleteDB(id: dataArray[indexPath.row].id)
             if result{
                 print("DB 에서 삭제 되었습니다.")
                 //self.readValue()
             }
             // Delete the row from the data source
-            todoList.remove(at: indexPath.row)
+            dataArray.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
-            
-            
         } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
+    }
+    // message
+    override func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "삭제!"
+    }
+    // 목록 순서 바꾸기
+    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+        // 이동할 item 의 복사
+        let itemToMove = dataArray[fromIndexPath.row]
+        // 이동할 item 의 삭제
+        dataArray.remove(at: fromIndexPath.row)
+        // 이동할 위치에 insert 한다.
+        dataArray.insert(itemToMove, at: to.row)
     }
     
     

@@ -4,16 +4,15 @@
     Date : 2024.5. 10
     Author : Ilhera
     Updates :
-         2024.05.10  by pdg
+        2024.05.10  by pdg :
             - 주석 생성
-        2024.04.11 by pdg
+        2024.05.11 by pdg :
             - delete 시 필요한 id 가 없는 것을 확인..
             - 모델에 id 추가!!
     Detail : -
     Bundle : com.swiftlec.SQLiteTodoAdvanced
 
 */
-
 
 struct TodoList {
     var id: Int // Auto increment id
