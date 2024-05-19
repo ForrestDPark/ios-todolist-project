@@ -46,10 +46,10 @@
             </objects>
             <point key="canvasLocation" x="652.67175572519079" y="-11.267605633802818"/>
         </scene>
-        <!--Search Todo View Controller-->
+        <!--Main View Controller-->
         <scene sceneID="JNQ-Ud-mBe">
             <objects>
-                <viewController id="hrc-Hk-0r7" customClass="SearchTodoViewController" customModule="SQLiteTodoAdvanced" sceneMemberID="viewController">
+                <viewController id="hrc-Hk-0r7" customClass="MainViewController" customModule="SQLiteTodoAdvanced" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="iJF-ms-1tq">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
