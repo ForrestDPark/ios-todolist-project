@@ -4,15 +4,16 @@
     Date : 2024.5. 10
     Author : Ilhera
     Updates :
-         2024.05.10  by pdg :
+         2024.05.10  by pdg : VM 생성
             - DB 삭제 function 부활 시킴 db 이름 todoList (L 대문자임!!)
             - compledate : todo 완료 일자임.
             - delete function return 수정
-         2024.05.11 by pdg :
+         2024.05.11 by pdg : 쿼리문 수정 및 완료
             - insert 쿼리 완성
             - delete 쿼리 완성
             - update 쿼리 완성
- 
+         2024.05.19 by pdg : 정리 및 주석생성
+            - 정리및 주석 생성
             
     Detail :
             - DB Columns
@@ -30,40 +31,36 @@ protocol QueryModelProtocol {
     func itemDownloaded(items: [TodoList])
 }
 
-
-//self.todoText = todoText
-//self.insertDate = insertDate
-//self.compleDate = compleDate
-//self.status = status
-//self.seq = seq
-
 class TodoListDB{
-    var db: OpaquePointer?
+    var db: OpaquePointer? // SQLite db C pointer
     var todoList: [TodoList] = []
-    var delegate: QueryModelProtocol!
+    var delegate: QueryModelProtocol! // Protocol delegate (nilable)
     
+    // DB initiation
     init() {
+        // SQLite DB file gen. : file name - > todoList.sqlite
         let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appending(path: "todoList.sqlite")
         
         if sqlite3_open(fileURL.path(percentEncoded: true), &db) != SQLITE_OK{
             print("error opening database")
         }
         
-        // Table 만들기
+        // DB Table 만들기
         if sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS todoList (id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT, insertdate TEXT, compledate TEXT, status INTEGER, seq INTEGER)", nil, nil, nil) != SQLITE_OK{
+            
             let errMsg = String(cString: sqlite3_errmsg(db)!)
             print("error creating table :\(errMsg)")
         }
     }
     
-    // todo insert
+    // Insert Query -> Bool
     // insertdate : 입력날짜
     // compledate : 완료된 날짜 => 처음 insert 시에는 compledate는 널값 처리
     func insertDB(text: String, insertdate: String, compledate: String, status: Int, seq: Int) -> Bool{
-        
-            var stmt: OpaquePointer?
-            let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-            let queryString = "INSERT INTO todoList ( text, insertdate, compledate, status, seq) VALUES (?,?,?,?,?)"
+        // statement 생성
+        var stmt: OpaquePointer?
+        let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+        let queryString = "INSERT INTO todoList ( text, insertdate, compledate, status, seq) VALUES (?,?,?,?,?)"
         var result : Bool = true
             sqlite3_prepare(db, queryString, -1, &stmt, nil)
             
@@ -82,7 +79,7 @@ class TodoListDB{
         return result
     }
     
-    // 조회
+    // Select Query -> delegate
     func queryDB(){
         var stmt: OpaquePointer?
         let queryString = "SELECT * FROM todoList ORDER BY insertdate"
@@ -117,21 +114,20 @@ class TodoListDB{
     }
     
     
-    // 삭제
+    // Delete Query -> Bool
     func deleteDB(id: Int) -> Bool{
         var stmt: OpaquePointer?
         let queryString = "DELETE FROM todoList WHERE id = ?"
         var result = true
+        // prepare
         sqlite3_prepare(db, queryString, -1, &stmt, nil)
-        
+        // ? -> statement binding
         sqlite3_bind_int(stmt, 1, Int32(id))
-
         if sqlite3_step(stmt) == SQLITE_DONE{
             result = true
         }else{
             result = false
         }
-        
     return result
     }
     
